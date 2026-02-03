@@ -1,0 +1,12 @@
+#define_param alpha range 0.1 to 1   default 0.1
+#define_param beta  range 0.1 to 0.9 default 0.5
+maxrate = 1.0;
+
+if(traffic > 1){
+	rate = rate * beta;
+}
+else{
+	rate = rate + alpha;
+	rate = min(rate, maxrate);
+}
+

@@ -1,0 +1,7 @@
+#define_param a range 0.1 to 1 default 0.5
+maxrate = 1.0;
+minrate = 0.0;
+
+rate = rate * a * (1 - rate - traffic) + rate;
+rate = max(minrate, min(maxrate, rate));
+

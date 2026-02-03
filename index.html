@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Network Simulation - Modern Redesign</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563EB",
+                        "background-light": "#F3F4F6",
+                        "background-dark": "#0f172a",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1e293b",
+                        "terminal-bg": "#1A2B3C",
+                        "terminal-text": "#33FF00",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                        mono: ["Fira Code", "Courier New", "monospace"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #2563EB;
+            cursor: pointer;
+            margin-top: -6px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .dark input[type=range]::-webkit-slider-runnable-track {
+            background: #475569;
+        }
+        .graph-glow {
+            filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.6));
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-100 font-body min-h-screen flex flex-col p-4 md:p-8 transition-colors duration-200">
+    <header
+        class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm p-4 mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-3xl">hub</span>
+                <h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Network Congestion Sim</h1>
+            </div>
+            <div class="flex flex-wrap items-center gap-6 text-sm">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                    <input checked=""
+                        class="form-checkbox rounded text-primary border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:ring-primary h-5 w-5 transition"
+                        type="checkbox" />
+                    <span
+                        class="font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition">Synchronize
+                        Input</span>
+                </label>
+                <div
+                    class="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <label class="text-gray-500 dark:text-gray-400 font-medium" for="duration">Duration:</label>
+                    <input
+                        class="w-16 bg-transparent border-none p-0 text-gray-900 dark:text-white focus:ring-0 font-semibold text-right"
+                        id="duration" type="number" value="50" />
+                </div>
+                <div class="flex items-center gap-4 border-l border-gray-200 dark:border-gray-700 pl-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span class="text-gray-500 dark:text-gray-400 font-medium text-xs uppercase tracking-wider">RTT
+                            User 1</span>
+                        <input id="rtt1"
+                            class="w-16 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 py-1 px-2 text-sm focus:border-primary focus:ring-primary"
+                            type="number" value="1" />
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span class="text-gray-500 dark:text-gray-400 font-medium text-xs uppercase tracking-wider">RTT
+                            User 2</span>
+                        <input id="rtt2"
+                            class="w-16 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 py-1 px-2 text-sm focus:border-primary focus:ring-primary"
+                            type="number" value="1" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
+        <section id="user1-panel" class="lg:col-span-3 flex flex-col gap-4">
+            <div
+                class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex flex-col h-full">
+                <div class="flex items-center gap-2 mb-6 border-b border-gray-100 dark:border-gray-700 pb-3">
+                    <div class="h-3 w-3 rounded-full bg-red-500"></div>
+                    <h2 class="font-bold text-lg text-gray-800 dark:text-white">User 1 <span
+                            class="text-[10px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded ml-2 tracking-widest">Y-AXIS</span>
+                    </h2>
+                </div>
+                <div class="mb-6 group">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-600 dark:text-gray-300">Alpha</label>
+                        <input
+                            class="w-20 text-right rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm py-1 px-2 focus:border-primary focus:ring-primary font-mono"
+                            step="0.1" type="number" value="0.1" />
+                    </div>
+                    <input class="w-full mb-2" max="1.0" min="0.1" step="0.1" type="range" value="0.1" />
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>0.1</span>
+                        <span>1.0</span>
+                    </div>
+                    <button
+                        class="mt-2 w-full text-xs text-primary dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 py-1.5 rounded transition font-medium border border-transparent hover:border-blue-100 dark:hover:border-blue-800">
+                        Reset to Default
+                    </button>
+                </div>
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-600 dark:text-gray-300">Beta</label>
+                        <input
+                            class="w-20 text-right rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm py-1 px-2 focus:border-primary focus:ring-primary font-mono"
+                            step="0.1" type="number" value="0.5" />
+                    </div>
+                    <input class="w-full mb-2" max="0.9" min="0.1" step="0.1" type="range" value="0.5" />
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>0.1</span>
+                        <span>0.9</span>
+                    </div>
+                    <button
+                        class="mt-2 w-full text-xs text-primary dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 py-1.5 rounded transition font-medium border border-transparent hover:border-blue-100 dark:hover:border-blue-800">
+                        Reset to Default
+                    </button>
+                </div>
+                <div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <label
+                        class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Script</label>
+                    <select id="script-user1"
+                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm py-2 px-3 focus:border-primary focus:ring-primary shadow-sm">
+                        <option>aimd.cav</option>
+                        <option>cubic.cav</option>
+                        <option>reno.cav</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+        <section class="lg:col-span-6 flex flex-col">
+            <div
+                class="bg-white dark:bg-gray-950 rounded-xl shadow-xl border-2 border-gray-300 dark:border-gray-600 p-8 flex-grow relative overflow-hidden flex items-center justify-center">
+                <div class="absolute inset-0 pointer-events-none opacity-[0.07] dark:opacity-[0.1]"
+                    style="background-image: linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px); background-size: 25px 25px;">
+                </div>
+                <div
+                    class="relative w-full aspect-square max-h-[500px] border-l-4 border-b-4 border-gray-900 dark:border-gray-400 bg-gray-50/30 dark:bg-gray-900/30">
+                    <canvas id="main-canvas" class="w-full h-full cursor-crosshair"
+                        style="border-radius: 4px;"></canvas>
+                    <span
+                        class="absolute -left-12 top-1/2 -rotate-90 text-[10px] font-black uppercase tracking-widest text-gray-400">User
+                        1 (Log)</span>
+                    <span
+                        class="absolute left-1/2 -bottom-8 -translate-x-1/2 text-[10px] font-black uppercase tracking-widest text-gray-400">User
+                        2 (Log)</span>
+                </div>
+            </div>
+        </section>
+        <section id="user2-panel" class="lg:col-span-3 flex flex-col gap-4">
+            <div
+                class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex flex-col h-full">
+                <div class="flex items-center gap-2 mb-6 border-b border-gray-100 dark:border-gray-700 pb-3">
+                    <div class="h-3 w-3 rounded-full bg-green-500"></div>
+                    <h2 class="font-bold text-lg text-gray-800 dark:text-white">User 2 <span
+                            class="text-[10px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded ml-2 tracking-widest">X-AXIS</span>
+                    </h2>
+                </div>
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-600 dark:text-gray-300">Alpha</label>
+                        <input
+                            class="w-20 text-right rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm py-1 px-2 focus:border-primary focus:ring-primary font-mono"
+                            step="0.1" type="number" value="0.1" />
+                    </div>
+                    <input class="w-full mb-2" max="1.0" min="0.1" step="0.1" type="range" value="0.1" />
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>0.1</span>
+                        <span>1.0</span>
+                    </div>
+                    <button
+                        class="mt-2 w-full text-xs text-primary dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 py-1.5 rounded transition font-medium border border-transparent hover:border-blue-100 dark:hover:border-blue-800">
+                        Reset to Default
+                    </button>
+                </div>
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-semibold text-gray-600 dark:text-gray-300">Beta</label>
+                        <input
+                            class="w-20 text-right rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm py-1 px-2 focus:border-primary focus:ring-primary font-mono"
+                            step="0.1" type="number" value="0.5" />
+                    </div>
+                    <input class="w-full mb-2" max="0.9" min="0.1" step="0.1" type="range" value="0.5" />
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>0.1</span>
+                        <span>0.9</span>
+                    </div>
+                    <button
+                        class="mt-2 w-full text-xs text-primary dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 py-1.5 rounded transition font-medium border border-transparent hover:border-blue-100 dark:hover:border-blue-800">
+                        Reset to Default
+                    </button>
+                </div>
+                <div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <label
+                        class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Script</label>
+                    <select id="script-user2"
+                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm py-2 px-3 focus:border-primary focus:ring-primary shadow-sm">
+                        <option>aimd.cav</option>
+                        <option>cubic.cav</option>
+                        <option>reno.cav</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        <div
+            class="lg:col-span-7 bg-terminal-bg rounded-xl shadow-lg border-2 border-slate-700/50 p-4 h-full flex flex-col">
+            <div class="flex items-center justify-between mb-3 border-b border-slate-700 pb-2">
+                <div class="flex items-center gap-2">
+                    <div class="flex gap-1.5">
+                        <div class="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase text-slate-400 tracking-[0.2em] ml-2">System
+                        Terminal</span>
+                </div>
+                <button
+                    class="text-[10px] text-terminal-text/70 hover:text-terminal-text uppercase tracking-widest font-bold flex items-center gap-1 transition-colors">
+                    <span class="material-symbols-outlined text-[14px]">download</span> Export
+                </button>
+            </div>
+            <textarea
+                class="w-full flex-1 bg-transparent border-none rounded-lg text-sm font-mono p-1 text-terminal-text resize-none focus:ring-0 leading-relaxed tracking-wider placeholder:text-terminal-text/30"
+                readonly="">Initializing simulation environment...
+[SYS] Loading AIMD script for User 1...
+[SYS] Loading AIMD script for User 2...
+[SYS] Synchronizing buffers...
+[OK] Ready for congestion simulation.
+_</textarea>
+        </div>
+        <div
+            class="lg:col-span-5 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-full">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4 mb-6">
+                <div class="col-span-2 flex gap-6">
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input
+                            class="rounded text-primary focus:ring-primary border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            type="checkbox" />
+                        <span
+                            class="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-primary transition">Create
+                            Logfiles</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input
+                            class="rounded text-primary focus:ring-primary border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                            type="checkbox" />
+                        <span
+                            class="text-sm font-medium text-gray-600 dark:text-gray-400 group-hover:text-primary transition">Plot
+                            Time Line</span>
+                    </label>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold w-16 text-gray-500 uppercase tracking-tight">X-Value</span>
+                        <input id="start-x"
+                            class="flex-1 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm px-2 py-1.5 focus:ring-primary focus:border-primary font-mono"
+                            type="text" value="0.0" />
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold w-16 text-gray-500 uppercase tracking-tight">Y-Value</span>
+                        <input id="start-y"
+                            class="flex-1 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm px-2 py-1.5 focus:ring-primary focus:border-primary font-mono"
+                            type="text" value="0.0" />
+                    </div>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-tight mb-1">Animation Delay</label>
+                    <div class="flex items-center gap-2">
+                        <input id="animation-delay"
+                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm px-2 py-1.5 focus:ring-primary focus:border-primary font-mono"
+                            type="number" value="1" />
+                        <span class="text-xs font-medium text-gray-400">ms</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 justify-end pt-4 border-t border-gray-100 dark:border-gray-700">
+                <button
+                    class="bg-primary hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:shadow-lg transition flex items-center gap-2 uppercase text-xs tracking-widest">
+                    <span class="material-symbols-outlined text-lg">refresh</span> Repaint
+                </button>
+                <button
+                    class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 font-bold py-2 px-5 rounded-lg transition shadow-sm uppercase text-xs tracking-widest">
+                    Clear
+                </button>
+                <button
+                    class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-transparent hover:border-red-200 dark:hover:border-red-800 font-bold py-2 px-5 rounded-lg transition flex items-center gap-2 uppercase text-xs tracking-widest">
+                    <span class="material-symbols-outlined text-lg">logout</span> Exit
+                </button>
+            </div>
+        </div>
+    </footer>
+    <div class="fixed bottom-4 right-4 z-50">
+        <button
+            class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 p-3 rounded-full shadow-2xl hover:scale-110 transition flex items-center justify-center border-2 border-white/20 dark:border-black/10"
+            onclick="document.documentElement.classList.toggle('dark')">
+            <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+            <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+        </button>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
