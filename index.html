@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Network Simulation - Modern Redesign</title>
+    <title>CAVTool - Congestion Avoidance Visualization</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
         rel="stylesheet" />
@@ -78,7 +78,12 @@
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary text-3xl">hub</span>
-                <h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Network Congestion Sim</h1>
+                <h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Web Based CAVTool</h1>
+                <button id="info-btn"
+                    class="ml-2 p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    title="About CAVTool">
+                    <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-xl">info</span>
+                </button>
             </div>
             <div class="flex flex-wrap items-center gap-6 text-sm">
                 <label class="flex items-center gap-2 cursor-pointer group">
@@ -342,6 +347,86 @@ _</textarea>
             <span class="material-symbols-outlined hidden dark:block">light_mode</span>
         </button>
     </div>
+
+    <!-- Info Modal -->
+    <div id="info-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div
+            class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">info</span>
+                        About CAVTool
+                    </h2>
+                    <button id="close-modal"
+                        class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <span class="material-symbols-outlined text-gray-500">close</span>
+                    </button>
+                </div>
+
+                <div class="space-y-4 text-sm text-gray-600 dark:text-gray-300">
+                    <div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white mb-1"> Motivation</h3>
+                        <p>Understanding how networks achieve fair resource sharing through congestion avoidance
+                            mechanisms is fundamental to network engineering. This tool provides an interactive way to
+                            visualize and experiment with these algorithms.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white mb-1"> What It Does</h3>
+                        <p>CAVTool visualizes how two network senders converge to fair and efficient resource sharing
+                            using vector diagrams. It supports multiple congestion avoidance algorithms including AIMD,
+                            AIAD, MIMD, MIAD, and CADPC.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white mb-1"> References</h3>
+                        <ul class="list-disc list-inside space-y-1 text-xs">
+                            <li><strong>Paper:</strong> D. Chiu and R. Jain, "Analysis of the Increase/Decrease
+                                Algorithms for Congestion Avoidance in Computer Networks", 1989</li>
+                            <li><strong>Original Author:</strong> Christian Sternagel</li>
+                            <li><strong>Supervisor:</strong> Michael Welzl</li>
+                            <li><a href="https://folk.universitetetioslo.no/michawe/research/tools/cavt/index.html"
+                                    target="_blank" class="text-primary hover:underline">Original CAVTool Website →</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white mb-1">Links</h3>
+                        <a href="https://github.com/username/CAVTool" target="_blank"
+                            class="text-primary hover:underline flex items-center gap-1">
+                            <span class="material-symbols-outlined text-base">code</span>
+                            View on GitHub
+                        </a>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-500">
+                        <p>Made for learning purposes 📖</p>
+                        <p class="mt-1">Web implementation © 2026</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Info modal handlers
+        document.getElementById('info-btn')?.addEventListener('click', () => {
+            document.getElementById('info-modal').classList.remove('hidden');
+            document.getElementById('info-modal').classList.add('flex');
+        });
+        document.getElementById('close-modal')?.addEventListener('click', () => {
+            document.getElementById('info-modal').classList.add('hidden');
+            document.getElementById('info-modal').classList.remove('flex');
+        });
+        document.getElementById('info-modal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('info-modal')) {
+                document.getElementById('info-modal').classList.add('hidden');
+                document.getElementById('info-modal').classList.remove('flex');
+            }
+        });
+    </script>
 
     <script type="module" src="js/app.js"></script>
 </body>
