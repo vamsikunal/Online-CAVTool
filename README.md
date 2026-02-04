@@ -68,6 +68,8 @@ CAVTool/
 │   └── visualization.js # Canvas rendering
 ├── scripts/            # Example .cav scripts
 
+```
+
 ## Credits
 
 This tool visualizes directly from the concepts from:
