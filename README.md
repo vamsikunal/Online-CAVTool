@@ -4,7 +4,7 @@ A modern web-based visualization tool for understanding and testing congestion a
 
 ## Overview
 
-CAVTool visualizes how two network senders share a single resource fairly using vector diagrams. It helps understand congestion avoidance algorithms like **AIMD** (Additive Increase Multiplicative Decrease), **AIAD**, **MIMD**, and **CADPC**.
+CAVTool visualizes how two network senders share a single resource fairly using vector diagrams. It helps understand congestion avoidance algorithms like **AIMD** (Additive Increase Multiplicative Decrease), **AIAD**, **MIMD**, **MIAD** and **CADPC**.
 
 ### Key Features
 

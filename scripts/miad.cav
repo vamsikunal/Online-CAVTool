@@ -1,0 +1,14 @@
+#define_param a range 0.1 to 2.0 default 1.2
+#define_param b range 0.1 to 0.9 default 0.3
+maxrate = 1.0;
+minrate = 0.0;
+
+if(traffic > 1){
+	rate = rate - b;
+	rate = max(rate, minrate);
+}
+else{
+	rate = rate * a;
+	rate = min(rate, maxrate);
+}
+
